@@ -728,23 +728,30 @@ footer {
         </div>
       </div>
       <div class="contact-form-card fade-up">
+        <form id="contact-form">
         <div class="form-row">
           <label class="form-label">Your Name</label>
-          <input class="form-input" type="text" placeholder="e.g. Jane Mensah">
+          <input class="form-input" type="text" name="name" placeholder="e.g. Jane Mensah" required>
         </div>
         <div class="form-row">
           <label class="form-label">Email Address</label>
-          <input class="form-input" type="email" placeholder="jane@company.com">
+          <input class="form-input" type="email" name="email" placeholder="jane@company.com" required>
         </div>
         <div class="form-row">
           <label class="form-label">What do you need?</label>
-          <input class="form-input" type="text" placeholder="e.g. Social Media Manager for our brand">
+          <input class="form-input" type="text" name="service" placeholder="e.g. Social Media Manager for our brand">
         </div>
         <div class="form-row">
           <label class="form-label">Message</label>
-          <textarea class="form-textarea" placeholder="Tell me about your project or brand..."></textarea>
+          <textarea class="form-textarea" name="message" placeholder="Tell me about your project or brand..." required></textarea>
         </div>
-        <button class="form-submit">Send Message &rarr;</button>
+        <button type="submit" class="form-submit" id="submit-btn">Send Message &#8594;</button>
+        </form>
+        <div id="form-success" style="display:none; text-align:center; padding:20px;">
+          <div style="font-size:32px; margin-bottom:10px;">&#10003;</div>
+          <div style="font-size:16px; font-weight:700; color:#14B8A6; margin-bottom:6px;">Message sent successfully!</div>
+          <div style="font-size:13px; color:#8B99B0;">Samuel will get back to you as soon as possible.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -775,16 +782,37 @@ window.addEventListener('scroll', () => {
   const scrollY = window.scrollY;
 });
 
-// Form handler
-document.querySelector('.form-submit').addEventListener('click', function() {
-  this.textContent = 'Message Sent! ✓';
-  this.style.background = '#0D9488';
-  this.style.color = '#fff';
-  setTimeout(() => {
-    this.textContent = 'Send Message →';
-    this.style.background = '';
-    this.style.color = '';
-  }, 3000);
+// Form handler — Formspree
+const form = document.getElementById('contact-form');
+const submitBtn = document.getElementById('submit-btn');
+const successBox = document.getElementById('form-success');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  submitBtn.textContent = 'Sending...';
+  submitBtn.style.opacity = '0.7';
+  submitBtn.disabled = true;
+
+  const data = new FormData(form);
+  try {
+    const res = await fetch('https://formspree.io/f/mdavdzeq', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      successBox.style.display = 'block';
+    } else {
+      submitBtn.textContent = 'Something went wrong — try again';
+      submitBtn.style.opacity = '1';
+      submitBtn.disabled = false;
+    }
+  } catch(err) {
+    submitBtn.textContent = 'Network error — try again';
+    submitBtn.style.opacity = '1';
+    submitBtn.disabled = false;
+  }
 });
 </script>
 </body>
